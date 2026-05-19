@@ -574,10 +574,17 @@ function renderStage4(payload) {
   const durabilities = ['Endüstriyel Sınıf A+', 'Hafif Alüminyum B+', 'Premium Kaplama A'];
   const spaces = ['Orta alan', 'Dar alan', 'Geniş alan'];
 
+  // If no items at all, hide the labels column too
+  const labelsColumn = document.querySelector('.comparison-labels-col, .comparison-grid > div:first-child');
+  if (items.length === 0 && labelsColumn) labelsColumn.style.display = 'none';
+
   const productColumns = document.querySelectorAll('.comparison-grid > div:nth-child(n+2):nth-child(-n+4)');
   productColumns.forEach((column, index) => {
     const item = items[index];
-    if (!item) return;
+    if (!item) {
+      column.style.display = 'none'; // hide columns with no real data
+      return;
+    }
 
     const name = column.querySelector('h2');
     const price = column.querySelector('.font-mono-data');
