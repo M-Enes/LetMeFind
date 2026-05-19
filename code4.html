@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e2e2e3",
+                    "primary": "#000000",
+                    "on-surface": "#1a1c1d",
+                    "on-secondary-fixed-variant": "#46464e",
+                    "on-secondary-container": "#63646c",
+                    "surface-container-low": "#f3f3f4",
+                    "surface-tint": "#5e5e5e",
+                    "tertiary-container": "#1b1b1b",
+                    "outline-variant": "#cfc4c5",
+                    "on-tertiary-fixed": "#1b1b1b",
+                    "surface-variant": "#e2e2e3",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed": "#1a1b22",
+                    "inverse-surface": "#2f3132",
+                    "background": "#f9f9fa",
+                    "on-tertiary-fixed-variant": "#474747",
+                    "surface-bright": "#f9f9fa",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#e8e8e9",
+                    "on-tertiary-container": "#848484",
+                    "inverse-on-surface": "#f0f1f2",
+                    "outline": "#7e7576",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#c6c6c6",
+                    "surface-container": "#eeeeef",
+                    "on-primary-fixed": "#1b1b1b",
+                    "surface-dim": "#dadadb",
+                    "tertiary-fixed-dim": "#c6c6c6",
+                    "tertiary": "#000000",
+                    "secondary-fixed-dim": "#c6c5cf",
+                    "on-primary-fixed-variant": "#474747",
+                    "secondary": "#5d5e66",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#e3e1ec",
+                    "primary-container": "#1b1b1b",
+                    "surface": "#f9f9fa",
+                    "on-surface-variant": "#4c4546",
+                    "on-primary-container": "#848484",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#e2e2e2",
+                    "secondary-fixed": "#e3e1ec",
+                    "tertiary-fixed": "#e2e2e2",
+                    "primary-fixed-dim": "#c6c6c6",
+                    "on-background": "#1a1c1d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xl": "64px",
+                    "sm": "8px",
+                    "lg": "32px",
+                    "gutter": "24px",
+                    "xxl": "128px",
+                    "xs": "4px",
+                    "margin": "48px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "mono-data": ["monospace"],
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h2": ["Inter"],
+                    "h1": ["Inter"],
+                    "display": ["Inter"]
+            },
+            "fontSize": {
+                    "mono-data": ["13px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "300"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "body-md": ["15px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "300"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f9f9fa;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 2fr;
+            column-gap: 64px;
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.03);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden" data-stage="4">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-900 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex items-center justify-between px-12 h-20 w-full transition-all duration-500 ease-out">
+<div class="text-xl font-bold tracking-tighter text-zinc-900 dark:text-zinc-50">AlBot</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-lg">
+<a class="font-sans tracking-tight text-sm font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 transition-all duration-500 ease-out" href="#">Discover</a>
+<a class="font-sans tracking-tight text-sm font-medium text-zinc-900 dark:text-zinc-50 border-b border-zinc-900 dark:border-zinc-50 pb-1 transition-all duration-500 ease-out" href="#">Analytics</a>
+<a class="font-sans tracking-tight text-sm font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 transition-all duration-500 ease-out" href="#">Archives</a>
+</div>
+<div class="flex items-center gap-md ml-lg">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-70 transition-opacity">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-70 transition-opacity">account_circle</span>
+</div>
+</div>
+</nav>
+<div class="pt-20">
+<!-- Main Content Canvas (Full Width) -->
+<main class="w-full max-w-7xl mx-auto px-margin py-xxl">
+<!-- Header Section -->
+<header class="mb-xxl">
+<div class="mb-md">
+<span class="font-label-caps text-on-secondary-container bg-surface-container-low px-3 py-1 rounded-full">AI ANALYSIS</span>
+</div>
+<h1 class="font-display text-display text-primary leading-tight">Senin kullanımına göre farklar</h1>
+<p class="font-body-lg text-secondary mt-lg max-w-3xl">
+                    Seçtiğin çalışma masalarını çalışma alışkanlıkların ve mekan kısıtlamalarına göre analiz ettik. İşte senin için en önemli parametreler.
+                </p>
+</header>
+<!-- Asymmetric Comparison Grid: 3 Products -->
+<section class="comparison-grid relative mb-xxl">
+<!-- Labels Column -->
+<div class="flex flex-col justify-end pb-lg">
+<div class="space-y-xxl">
+<div class="h-48"></div> <!-- Spacer for images -->
+<div class="pt-lg border-t border-zinc-100">
+<span class="font-label-caps text-on-secondary-container opacity-50">Neden bu?</span>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<span class="font-label-caps text-on-secondary-container opacity-50">Dayanıklılık</span>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<span class="font-label-caps text-on-secondary-container opacity-50">Alan Verimliliği</span>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<span class="font-label-caps text-on-secondary-container opacity-50">Fiyat Performans</span>
+</div>
+</div>
+</div>
+<!-- Product A: Mono-X 70 -->
+<div class="flex flex-col">
+<div class="h-48 mb-lg overflow-hidden rounded-lg custom-shadow border border-zinc-100/50">
+<img class="w-full h-full object-cover grayscale opacity-90" data-alt="Industrial desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDiN6F6Jm66ykTkMjDeDmF-Tafp_13aVnzPsh7hSvdiTPcRxJJfzYPtJTdUBvis46Z0b2sIGsDCI2-DGpyQV3cZCqTtk5zSRGOUrKcDxYOfa1p6SJFFMZgLiJBdEVA9uEOTStJrI4UTzLw9jX1p4OPMeDeZGjti6qs9Wvjyjq0vTKvLHfkkWvgD1_9YZJvAqAYsm9LrgagOa1w88Am5-F9AW7WeNP8HglUIH7AEliRewukAG7GUxoPXElk3Nv07W7lmaTXuOY0fjw"/>
+</div>
+<div class="mb-lg">
+<h2 class="font-h1 text-h1">Mono-X 70</h2>
+<p class="font-mono-data text-secondary mt-2">₺12.400,00</p>
+</div>
+<div class="space-y-xxl">
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md font-semibold text-primary">Daha sağlam: Endüstriyel çelik iskelet, uzun ömürlü kullanım.</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md text-secondary">Endüstriyel Sınıf A+</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md text-secondary">Sabit Genişlik (140cm)</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-zinc-200 text-sm">star</span>
+<span class="material-symbols-outlined text-zinc-200 text-sm">star</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product B: Slim-Draft 60 -->
+<div class="flex flex-col">
+<div class="h-48 mb-lg overflow-hidden rounded-lg custom-shadow border border-zinc-100/50">
+<img class="w-full h-full object-cover grayscale opacity-90" data-alt="Compact desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC07FN89cfBsLXH8VaYCM5D_8JQsPyfWCUyqZLujrev7PvHEfHzfsTvP0pVE_2FdSaADClBd0zVA3eY5bqG8DcYIPeSWee0zcGEoifeWbkxro680o2qT7hVYVvBFyFXYxybZgk-tomVgerXex1pMTZNWtqIGREoUCUTiRj4qEuw1C5H5vHv5e1XpRVOClxCUOOeyMpvJvqZUbzMCgbsWM290i3ZE60I478cS7lCLK88N3jREqbjzmd5r0mEOztVa6_UTrUfWAPmMuI"/>
+</div>
+<div class="mb-lg">
+<h2 class="font-h1 text-h1">Slim-Draft 60</h2>
+<p class="font-mono-data text-secondary mt-2">₺8.200,00</p>
+</div>
+<div class="space-y-xxl">
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md font-semibold text-primary">Daha kompakt: Katlanabilir mekanizma, ultra küçük alanlar için optimize.</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md text-secondary">Hafif Alüminyum B+</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md text-secondary">Katlanabilir (60cm)</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-zinc-200 text-sm">star</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product C: Vertex Corner 75 (New) -->
+<div class="flex flex-col">
+<div class="h-48 mb-lg overflow-hidden rounded-lg custom-shadow border border-zinc-100/50">
+<img class="w-full h-full object-cover grayscale opacity-90" data-alt="Corner desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWurxwuH8cw1aw07lYKXvPOFOKNPnEYBF4zkfVseaGPMIRqaMhdCbrg8y_rfrl6S41gxLVnJRE1eb8hJzouNJPAfK9cDSMTnNlX6KWAO1Nl2TgfxnvOW30b6f-W-wMeTituxQG7dFE5YSHhjq5oPc9RMQdL7iVLHyutQx5ASarUv62nh0eqCaFPMuKRGL40iyfCBhTao8VB-UeDk90nbYktNQ0CX0E_Y21rPMHi-6cBwxn5q8yqGyo_wybcDPOSxQFioTwVmhwKBw"/>
+</div>
+<div class="mb-lg">
+<h2 class="font-h1 text-h1">Vertex Corner 75</h2>
+<p class="font-mono-data text-secondary mt-2">₺15.900,00</p>
+</div>
+<div class="space-y-xxl">
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md font-semibold text-primary">Maksimum Alan: Köşe formuyla ölü alanları değerlendiren geniş yüzey.</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md text-secondary">Premium Meşe Kaplama A</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<p class="font-body-md text-secondary">L-Form (160x120cm)</p>
+</div>
+<div class="pt-lg border-t border-zinc-100">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- AI Insight Box -->
+<section class="max-w-6xl mx-auto mb-xxl">
+<div class="bg-white p-xl rounded-lg custom-shadow border border-zinc-50 flex items-center gap-xl">
+<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-3xl">auto_awesome</span>
+</div>
+<div class="flex-1">
+<h3 class="font-h2 text-h2 mb-2">Özet Değerlendirme</h3>
+<p class="font-body-lg text-secondary italic">
+                            "Analizimize göre, eğer çalışma alanın dar ise Slim-Draft en mantıklı seçenek. Ancak geniş bir yüzey ve profesyonel bir köşe kurulumu arıyorsan Vertex Corner 75, uzun vadedeki konforun için en iyi yatırımı temsil ediyor."
+                        </p>
+</div>
+<div class="flex flex-col gap-2 shrink-0">
+<button class="bg-primary text-on-primary py-3 px-8 rounded-full font-label-caps text-[11px] hover:opacity-90 transition-opacity">SEÇİMİ TAMAMLA</button>
+<button class="text-primary font-label-caps text-[11px] hover:underline transition-all py-2">DETAYLARI İNCELE</button>
+</div>
+</div>
+</section>
+<!-- Additional Nuances (Asymmetric Layout) -->
+<section class="grid grid-cols-12 gap-gutter">
+<div class="col-span-4 p-lg border-l border-zinc-100">
+<h4 class="font-label-caps text-zinc-400 mb-lg">Lojistik Farkı</h4>
+<div class="space-y-md">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-primary">Mono-X 70</span>
+<span class="font-mono-data bg-zinc-100 px-2 py-0.5 rounded">2-4 Hafta</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-primary">Slim-Draft 60</span>
+<span class="font-mono-data bg-zinc-100 px-2 py-0.5 rounded">Aynı Gün</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-primary">Vertex Corner 75</span>
+<span class="font-mono-data bg-zinc-100 px-2 py-0.5 rounded">1 Hafta</span>
+</div>
+</div>
+</div>
+<div class="col-span-8 p-lg bg-zinc-50/50 rounded-lg">
+<h4 class="font-label-caps text-zinc-400 mb-lg">Kullanıcı Deneyimi Trendi</h4>
+<div class="flex items-end gap-sm h-32">
+<div class="flex-1 bg-zinc-200 h-[40%]" title="Mono-X"></div>
+<div class="flex-1 bg-zinc-300 h-[55%]" title="Slim-Draft"></div>
+<div class="flex-1 bg-zinc-200 h-[45%]" title="Mono-X"></div>
+<div class="flex-1 bg-zinc-400 h-[70%]" title="Slim-Draft"></div>
+<div class="flex-1 bg-zinc-200 h-[50%]" title="Mono-X"></div>
+<div class="flex-1 bg-zinc-900 h-[90%]" title="Trend Leader"></div>
+<div class="flex-1 bg-zinc-200 h-[60%]" title="Mono-X"></div>
+</div>
+<p class="font-label-caps text-[10px] text-zinc-400 mt-md">Son 30 günlük ilgi indeksi — Slim-Draft %24 daha fazla aranıyor.</p>
+</div>
+</section>
+</main>
+</div>
+<!-- Background Elements -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 opacity-20">
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-zinc-100 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-zinc-200 rounded-full blur-[100px]"></div>
+</div>
+<script src="stage.js"></script>
+</body></html>

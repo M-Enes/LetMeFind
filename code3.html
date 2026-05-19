@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html lang="tr" style="width: 1280px; height: 1024px; overflow: hidden; position: relative;"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e2e2e3",
+                    "on-secondary-fixed": "#1a1b22",
+                    "inverse-on-surface": "#f0f1f2",
+                    "tertiary": "#000000",
+                    "on-primary-fixed": "#1b1b1b",
+                    "inverse-primary": "#c6c6c6",
+                    "surface-container-low": "#f3f3f4",
+                    "outline": "#7e7576",
+                    "on-primary-fixed-variant": "#474747",
+                    "primary-fixed-dim": "#c6c6c6",
+                    "error-container": "#ffdad6",
+                    "background": "#f9f9fa",
+                    "surface": "#f9f9fa",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#dadadb",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#e8e8e9",
+                    "on-primary-container": "#848484",
+                    "surface-container-highest": "#e2e2e3",
+                    "on-secondary-container": "#63646c",
+                    "primary-fixed": "#e2e2e2",
+                    "on-tertiary-fixed-variant": "#474747",
+                    "outline-variant": "#cfc4c5",
+                    "on-background": "#1a1c1d",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-secondary-fixed-variant": "#46464e",
+                    "on-tertiary-fixed": "#1b1b1b",
+                    "tertiary-container": "#1b1b1b",
+                    "tertiary-fixed-dim": "#c6c6c6",
+                    "secondary-container": "#e3e1ec",
+                    "on-surface-variant": "#4c4546",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#e3e1ec",
+                    "primary-container": "#1b1b1b",
+                    "surface-tint": "#5e5e5e",
+                    "on-tertiary-container": "#848484",
+                    "primary": "#000000",
+                    "secondary": "#5d5e66",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#c6c5cf",
+                    "surface-container": "#eeeeef",
+                    "surface-bright": "#f9f9fa",
+                    "inverse-surface": "#2f3132",
+                    "on-surface": "#1a1c1d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xxl": "128px",
+                    "xs": "4px",
+                    "unit": "4px",
+                    "sm": "8px",
+                    "xl": "64px",
+                    "gutter": "24px",
+                    "margin": "48px",
+                    "lg": "32px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "h2": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display": ["Inter"],
+                    "mono-data": ["monospace"],
+                    "label-caps": ["Inter"],
+                    "h1": ["Inter"]
+            },
+            "fontSize": {
+                    "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "body-md": ["15px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "300"}],
+                    "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "300"}],
+                    "mono-data": ["13px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f9f9fa;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface selection:bg-primary-fixed" data-stage="3">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500 ease-out flex items-center justify-between px-12 h-20">
+<div class="text-xl font-bold tracking-tighter text-zinc-900 dark:text-zinc-50">AlBot</div>
+<div class="flex items-center gap-x-8">
+<a class="font-sans tracking-tight text-sm font-medium text-zinc-900 dark:text-zinc-50 border-b border-zinc-900 dark:border-zinc-50 pb-1 active:opacity-70 transition-opacity" href="#">Discover</a>
+<a class="font-sans tracking-tight text-sm font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 active:opacity-70 transition-opacity" href="#">Analytics</a>
+<a class="font-sans tracking-tight text-sm font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 active:opacity-70 transition-opacity" href="#">Archives</a>
+</div>
+<div class="flex items-center gap-x-4">
+<button class="material-symbols-outlined text-zinc-900 dark:text-zinc-50 p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors" data-icon="settings">settings</button>
+<button class="material-symbols-outlined text-zinc-900 dark:text-zinc-50 p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors" data-icon="account_circle">account_circle</button>
+</div>
+</nav>
+<div class="pt-20 h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<!-- Main Content Area -->
+<main class="flex flex-col overflow-hidden bg-background max-w-7xl mx-auto flex-1">
+<div class="flex h-full">
+<!-- Results Grid -->
+<div class="flex-1 overflow-y-auto px-margin py-xl hide-scrollbar">
+<div class="mb-xl">
+<span class="font-label-caps text-on-surface-variant mb-sm block">Arama Sonuçları</span>
+<h1 class="font-display text-display text-on-surface max-w-2xl">
+                            '60-80 cm masa, siyah, küçük oda' için en iyi seçenekler.
+                        </h1>
+<p class="mt-md font-body-lg text-secondary max-w-xl">
+                            AI-Aether sizin için 241 ürünü taradı ve alan tasarrufu sağlayan 3 mükemmel eşleşme buldu.
+                        </p>
+</div>
+<!-- Asymmetric Product Grid -->
+<div class="grid grid-cols-3 gap-gutter items-stretch"><!-- Product 1 -->
+<div class="group bg-white rounded-lg border border-zinc-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-500 flex flex-col">
+<div class="aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxWdn5yRCXIFCarGsgzI4k6vHjyMydWcOmjTYDBbvQEXiBn98xCxx47fmzE27ZCq35bmHgsXLbNtFNpugFVg7YMMjev2Izx2EaElLZlh2-IXPeG8s25KuJGiYLpNFf-0g_MtwM9YaB7lmMmRhmUYltOZe4Bwx97yMSjy6w1Ywnjzz_uxeC1G9yoInxwRiQYG_DA8KSkkXKEqLwu2AJEHigtOhTkUgK2MqZK7q1yDjyf37Lrz0X5Jy7drlGBTkGIbgCpkDnA3JdpIc"/>
+</div>
+<div class="p-lg space-y-md">
+<div class="flex justify-between items-baseline">
+<h2 class="font-h2 text-lg text-on-surface">Mono-X 70 Compact</h2>
+<div class="font-mono-data text-on-surface">₺3.450</div>
+</div>
+<div class="border-t border-zinc-100 pt-md">
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+<span class="font-label-caps text-[10px] tracking-widest">AI EŞLEŞME ANALİZİ</span>
+</div>
+<ul class="space-y-2">
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight"><strong class="font-medium text-on-surface">70 cm genişlik</strong> → Arama kriterine tam uyum</p>
+</li>
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight">Mat siyah kaplama ile estetik bütünlük</p>
+</li>
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight">Derinlik 45cm: Küçük oda için ideal profil</p>
+</li>
+</ul>
+</div>
+</div></div>
+<!-- Product 2 -->
+<div class="group bg-white rounded-lg border border-zinc-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-500 flex flex-col">
+<div class="aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMEyQU-AmBbfLJZdWrjJZ08-V-eaGGaGothJ3dm3ZURnySfwX39rFNkCszpWooPNCNUnep1x21PxRbK2OKbzpMUwOur_7cU0Z8b1rbvI1mG8hKS5i7p61TWgEmA1iRs54eUA_BYmeJe0Z9kIVfOg0x747Ta3qzTp0mK64U8mB3K4_y_PRscRuEERIGxWGKGl6WPWMNnKCfh8tCc7ofdwsUrK95RcJ--5c8lLyd02aoZXM6n4_Z_ufXTjVxHnIGMDDtz3HFX0UK3Lg"/>
+</div>
+<div class="p-lg space-y-md">
+<div class="flex justify-between items-baseline">
+<h2 class="font-h2 text-lg text-on-surface">Slim-Draft 60</h2>
+<div class="font-mono-data text-on-surface">₺2.100</div>
+</div>
+<div class="border-t border-zinc-100 pt-md">
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">bolt</span>
+<span class="font-label-caps text-[10px] tracking-widest">NEDEN BU ÜRÜN?</span>
+</div>
+<ul class="space-y-2">
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight"><strong class="font-medium text-on-surface">60 cm genişlik</strong> → En dar seçenek (Ultra-kompakt)</p>
+</li>
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight">Katlanabilir mekanizma → Çok dar alanlar için</p>
+</li>
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight">İnce metal ayaklar ile ferah görünüm</p>
+</li>
+</ul>
+</div>
+</div></div>
+<!-- Product 3 -->
+<div class="group bg-white rounded-lg border border-zinc-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-500 flex flex-col">
+<div class="aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrl1y_NWZAAyXNaD7XDk3HBDT7-fvGddd0vxNCJ7LntYzNwn84JUXZjsQOFWkJClEZkkc_J1e84pl3a7AoNAOxMlL5mUJ5zwWjq0hrOcWnUXD6UAE43bog3O_m7jMpQDjBmprXSOTIKWdih90i1NnChYHSBk79WDq0whQp5JCfXon0fuUC-0R_q4VkwtfLEKUdisQBG7OLOgVr8SYPGsyWficrDyYwXyW5ggWPI5yW9lJwRFqRtZrz9zUbsCafQTrYZiQS29KY4UY"/>
+</div>
+<div class="p-lg space-y-md">
+<div class="flex justify-between items-baseline">
+<h2 class="font-h2 text-lg text-on-surface">Vertex Corner 75</h2>
+<div class="font-mono-data text-on-surface">₺4.890</div>
+</div>
+<div class="border-t border-zinc-100 pt-md">
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">verified</span>
+<span class="font-label-caps text-[10px] tracking-widest">EDİTÖRÜN NOTU</span>
+</div>
+<ul class="space-y-2">
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight"><strong class="font-medium text-on-surface">Köşe tasarımı</strong> → Atıl alanları değerlendirir</p>
+</li>
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight">75 cm kanat uzunluğu → Aralığa uygun</p>
+</li>
+<li class="flex items-start gap-2">
+<span class="w-1 h-1 rounded-full bg-zinc-300 mt-2 shrink-0"></span>
+<p class="text-[13px] font-light text-secondary leading-tight">Entegre depolama ile ek alan kazandırır</p>
+</li>
+</ul>
+</div>
+</div></div></div>
+</div>
+<!-- AI Filters Panel (Right Side) -->
+<aside class="w-[380px] border-l border-zinc-100 bg-white p-lg overflow-y-auto shrink-0 flex flex-col gap-y-10">
+<div>
+<div class="flex items-center mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="psychology" style='font-variation-settings: "FILL" 1;'>psychology</span>
+<h2 class="font-h2 text-h2 font-semibold">Senin için oluşturulan filtreler</h2>
+</div>
+<p class="text-sm text-secondary leading-relaxed">
+                            Arama niyetinizi analiz ettik ve en alakalı kriterleri bu panelde topladık.
+                        </p>
+</div>
+<div class="space-y-12">
+<!-- Filter 1: Genişlik Slider -->
+<div class="group">
+<div class="flex justify-between items-center mb-6">
+<label class="font-label-caps text-[11px] text-on-surface">1. GENİŞLİK</label>
+<span class="font-mono-data text-sm bg-zinc-50 px-2 py-1 rounded">60–80 cm</span>
+</div>
+<div class="relative h-1 bg-zinc-100 rounded-full">
+<div class="absolute h-full bg-black rounded-full left-[20%] right-[30%]"></div>
+<div class="absolute top-1/2 -translate-y-1/2 left-[20%] w-4 h-4 bg-white border-2 border-black rounded-full shadow-sm cursor-pointer"></div>
+<div class="absolute top-1/2 -translate-y-1/2 right-[30%] w-4 h-4 bg-white border-2 border-black rounded-full shadow-sm cursor-pointer"></div>
+</div>
+</div>
+<!-- Filter 2: Renk Dropdown/Toggle -->
+<div>
+<label class="font-label-caps text-[11px] text-on-surface mb-6 block">2. RENK</label>
+<div class="grid grid-cols-3 gap-gutter items-stretch">
+<button class="flex items-center justify-center gap-3 py-3 rounded-lg border-2 border-black bg-white transition-all">
+<div class="w-4 h-4 rounded-full bg-black ring-2 ring-offset-2 ring-black/20"></div>
+<span class="font-label-caps text-[10px] font-bold">Siyah</span>
+</button>
+<button class="flex items-center justify-center gap-3 py-3 rounded-lg border border-zinc-100 bg-zinc-50/50 text-zinc-400 hover:border-zinc-300 transition-all opacity-50">
+<div class="w-4 h-4 rounded-full bg-zinc-200"></div>
+<span class="font-label-caps text-[10px]">Diğer</span>
+</button>
+</div>
+</div>
+<!-- Filter 3: Kategori Pills -->
+<div>
+<label class="font-label-caps text-[11px] text-on-surface mb-6 block">3. KATEGORİ</label>
+<div class="flex flex-wrap gap-2">
+<span class="px-4 py-2 bg-black text-white rounded-full font-label-caps text-[10px]">MASA</span>
+<span class="px-4 py-2 bg-zinc-100 text-zinc-400 rounded-full font-label-caps text-[10px] cursor-not-allowed">KONSOL</span>
+<span class="px-4 py-2 bg-zinc-100 text-zinc-400 rounded-full font-label-caps text-[10px] cursor-not-allowed">RAF</span>
+</div>
+</div>
+<!-- Filter 4: Kullanım Switch -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg border border-zinc-100">
+<div>
+<label class="font-label-caps text-[11px] text-on-surface block mb-1">4. KULLANIM</label>
+<span class="text-[13px] text-secondary">Küçük alanlar için optimize</span>
+</div>
+<div class="w-12 h-6 bg-black rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-8">
+<button class="w-full py-5 bg-white border border-zinc-900 text-zinc-900 rounded-full font-label-caps text-[11px] tracking-widest hover:bg-zinc-900 hover:text-white transition-all duration-300">
+                            FİLTRELERİ SIFIRLA
+                        </button>
+<p class="text-center text-[10px] text-zinc-400 mt-6 font-medium italic">
+                            * Bu filtreler AI tarafından sorgunuza özel üretilmiştir.
+                        </p>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<script src="stage.js"></script>
+</body></html>
