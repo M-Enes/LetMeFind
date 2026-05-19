@@ -132,7 +132,7 @@ async function fetchAmazonProducts(query) {
     console.log('Trying Amazon API with correct endpoint...');
     // Use the exact format from RapidAPI example
     const searchUrl = `${PRODUCT_SOURCES.amazon.baseUrl}/search?query=${encodeURIComponent(query)}&page=1&country=US&sort_by=RELEVANCE&product_condition=ALL&is_prime=false&deals_and_discounts=NONE`;
-    
+
     const payload = await fetchJson(searchUrl, {
       method: 'GET',
       headers: PRODUCT_SOURCES.amazon.headers,
@@ -153,19 +153,19 @@ async function fetchFakeStoreProducts(query) {
   try {
     console.log('Trying FakeStore API...');
     const products = await fetchJson(`${PRODUCT_SOURCES.fakestore.baseUrl}/products`);
-    
+
     // Filter products based on query
     const queryLower = query.toLowerCase();
-    const filtered = products.filter(product => 
+    const filtered = products.filter(product =>
       product.title.toLowerCase().includes(queryLower) ||
       product.description.toLowerCase().includes(queryLower) ||
       product.category.toLowerCase().includes(queryLower)
     );
-    
+
     const results = (filtered.length > 0 ? filtered : products.slice(0, 5))
       .slice(0, 5)
       .map(normalizeFakeStoreProduct);
-    
+
     console.log(`FakeStore returned ${results.length} products`);
     return results;
   } catch (error) {
@@ -178,19 +178,19 @@ async function fetchPlatziProducts(query) {
   try {
     console.log('Trying Platzi API...');
     const products = await fetchJson(`${PRODUCT_SOURCES.platzi.baseUrl}/products?limit=20`);
-    
+
     // Filter products based on query
     const queryLower = query.toLowerCase();
-    const filtered = products.filter(product => 
+    const filtered = products.filter(product =>
       product.title?.toLowerCase().includes(queryLower) ||
       product.description?.toLowerCase().includes(queryLower) ||
       product.category?.name?.toLowerCase().includes(queryLower)
     );
-    
+
     const results = (filtered.length > 0 ? filtered : products.slice(0, 5))
       .slice(0, 5)
       .map(normalizePlatziProduct);
-    
+
     console.log(`Platzi returned ${results.length} products`);
     return results;
   } catch (error) {
@@ -202,13 +202,13 @@ async function fetchPlatziProducts(query) {
 async function fetchDummyJsonProducts(query) {
   try {
     console.log('Trying DummyJSON...');
-    
+
     // Detect category from query
     const isFurnitureQuery = /sofa|table|chair|desk|cabinet|shelf|bed|wardrobe|furniture|mobilya|masa|koltuk|karyola/i.test(query);
     const isLaptopQuery = /laptop|computer|notebook|bilgisayar/i.test(query);
     const isPhoneQuery = /phone|mobile|telefon|iphone|samsung/i.test(query);
     const isBeautyQuery = /beauty|makeup|cosmetic|güzellik|makyaj/i.test(query);
-    
+
     let endpoint;
     if (isFurnitureQuery) {
       endpoint = 'https://dummyjson.com/products/category/furniture?limit=10';
@@ -221,10 +221,10 @@ async function fetchDummyJsonProducts(query) {
     } else {
       endpoint = `https://dummyjson.com/products/search?q=${encodeURIComponent(query || 'product')}`;
     }
-    
+
     const payload = await fetchJson(endpoint);
     const results = (payload.products || []).slice(0, 5).map(normalizeDummyProduct);
-    
+
     console.log(`DummyJSON returned ${results.length} products`);
     return results;
   } catch (error) {
@@ -314,8 +314,8 @@ async function fetchProductMatches(query) {
   console.log(`Final results: ${finalResults.length}, Sources: ${sources.join(', ')}`);
 
   // Add sources metadata
-  return Object.assign(finalResults.slice(0, 10), { 
-    sources: sources.length > 0 ? sources : ['Fallback'] 
+  return Object.assign(finalResults.slice(0, 10), {
+    sources: sources.length > 0 ? sources : ['Fallback']
   });
 }
 

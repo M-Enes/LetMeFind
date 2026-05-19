@@ -1,3 +1,5 @@
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 function buildPrompt({ query, message, products = [] }) {
   const productLines = products.slice(0, 3).map((product) => {
     return `${product.name} | ${product.priceTry || product.price} | ${product.category} | ${product.description}`;
@@ -27,6 +29,37 @@ async function generateGeminiReply(body = {}) {
     return 'Gemini anahtarı tanımlı değil. Şu an ürünleri kıyaslayabilirim, ama gerçek Gemini yanıtı için GEMINI_API_KEY eklenmeli.';
   }
 
+  try {
+    console.log('Initializing Gemini API...');
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+
+    console.log('Sending request to Gemini...');
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    console.log('Gemini response received successfully');
+    return text || 'Yanıt üretilemedi.';
+  } catch (error) {
+    console.error('Gemini API error:', error.message);
+    
+    // Fallback to REST API if the library fails
+    try {
+      console.log('Trying Gemini REST API fallback...');
+      return await generateGeminiReplyREST(body);
+    } catch (restError) {
+      console.error('Gemini REST API also failed:', restError.message);
+      return 'Gemini yanıtı alınamadı. API anahtarını kontrol edin.';
+    }
+  }
+}
+
+// Fallback REST API implementation
+async function generateGeminiReplyREST(body = {}) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  const prompt = buildPrompt(body);
+
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
   const response = await fetch(endpoint, {
     method: 'POST',
@@ -36,7 +69,6 @@ async function generateGeminiReply(body = {}) {
     body: JSON.stringify({
       contents: [
         {
-          role: 'user',
           parts: [{ text: prompt }],
         },
       ],
@@ -48,6 +80,8 @@ async function generateGeminiReply(body = {}) {
   });
 
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Gemini REST API error response:', errorText);
     throw new Error(`Gemini request failed: ${response.status}`);
   }
 
