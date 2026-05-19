@@ -131,7 +131,7 @@ async function fetchAmazonProducts(query) {
   try {
     console.log('Trying Amazon API with correct endpoint...');
     // Use the exact format from RapidAPI example
-    const searchUrl = `${PRODUCT_SOURCES.amazon.baseUrl}/search?query=${encodeURIComponent(query)}&page=1&country=US&sort_by=RELEVANCE&product_condition=ALL&is_prime=false&deals_and_discounts=NONE`;
+    const searchUrl = `${PRODUCT_SOURCES.amazon.baseUrl}/search?query=${encodeURIComponent(query)}&page=1&country=TR&sort_by=RELEVANCE&product_condition=ALL&is_prime=false&deals_and_discounts=NONE`;
 
     const payload = await fetchJson(searchUrl, {
       method: 'GET',
