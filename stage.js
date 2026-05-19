@@ -241,106 +241,290 @@ function renderStage2(payload) {
 }
 
 function renderStage3(payload) {
-  // Results: Show live product results with filters
+  // Results: AI filters + prefetched content switching
   const currentPayload = payload || loadContext();
   const queryText = currentPayload?.query || query;
-  const items = currentPayload?.items || [];
+  const allItems = currentPayload?.items || [];
+  const prefetchedResults = currentPayload?.prefetchedResults || {};
+  const aiFilters = currentPayload?.filters || {};
 
   const title = document.querySelector('main h1');
   if (title) title.textContent = `'${queryText}' için en iyi seçenekler.`;
 
   const meta = document.querySelector('main p.font-body-lg');
+  const cards = document.querySelectorAll('main .grid > div');
+  const priceFilter = document.getElementById('price-filter');
+  const inputMin = document.getElementById('price-range-min');
+  const inputMax = document.getElementById('price-range-max');
+  const fill = document.getElementById('price-slider-fill');
+  const badge = document.getElementById('price-range-badge');
+  const minLabel = document.getElementById('price-min-label');
+  const maxLabel = document.getElementById('price-max-label');
 
-  // Handle empty results
-  if (items.length === 0 || (items.length === 1 && items[0].id === 'fallback_1')) {
+  if (allItems.length === 0 || (allItems.length === 1 && allItems[0].id === 'fallback_1')) {
     if (meta) meta.textContent = `"${queryText}" için sonuç bulunamadı. Farklı anahtar kelimeler deneyin.`;
-
-    // Hide product grid and show empty state
-    const productGrid = document.querySelector('main .grid.grid-cols-3.gap-gutter.items-stretch');
-    if (productGrid) {
-      productGrid.innerHTML = `
-        <div class="col-span-3 text-center py-xl">
-          <div class="text-6xl mb-md">🔍</div>
-          <h3 class="text-h2 mb-sm">Sonuç bulunamadı</h3>
-          <p class="text-secondary mb-lg">Bu arama için ürün bulunamadı. Farklı kelimeler deneyin:</p>
-          <div class="flex flex-wrap justify-center gap-sm">
-            <button class="px-md py-sm bg-surface-container rounded-full text-sm hover:bg-surface-container-high" onclick="window.location.href='discovery.html'">
-              Yeni arama
-            </button>
-          </div>
-        </div>
-      `;
-    }
+    cards.forEach((card) => {
+      card.style.display = 'none';
+    });
+    if (priceFilter) priceFilter.style.display = 'none';
     return;
   }
 
-  // Normal results handling
-  if (meta) meta.textContent = `Canlı katalogda bulunan ${items.length} ürün arasından ${Math.min(items.length, 3)} sonuç öne çıkarıldı.`;
+  function parseDisplayPrice(item) {
+    if (Number.isFinite(item.priceTryValue)) return item.priceTryValue;
+    const raw = item.priceTry || item.price || '';
+    const cleaned = String(raw)
+      .replace(/[^\d.,]/g, '')
+      .replace(/\./g, '')
+      .replace(',', '.');
+    const num = Number.parseFloat(cleaned);
+    return Number.isFinite(num) ? Math.round(num) : 0;
+  }
 
-  const cards = document.querySelectorAll('main .grid > div');
-  cards.forEach((card, index) => {
-    const item = items[index];
-    if (!item) {
-      // Hide empty cards
-      card.style.display = 'none';
-      return;
-    }
+  function formatTry(value) {
+    return `₺${Math.round(value).toLocaleString('tr-TR')}`;
+  }
 
-    // Show and populate card
-    card.style.display = 'block';
-
-    // Handle image with simple loading state
-    const image = card.querySelector('img');
-    if (image) {
-      // Hide image initially
-      image.style.display = 'none';
-
-      if (item.image && item.image.trim()) {
-        // Try to load the image
-        const tempImg = new Image();
-        tempImg.onload = function () {
-          image.src = item.image;
-          image.style.display = 'block';
-        };
-        tempImg.onerror = function () {
-          // Keep image hidden if it fails to load
-          image.style.display = 'none';
-        };
-        tempImg.src = item.image;
+  function renderCards(items) {
+    const visibleItems = items.slice(0, cards.length);
+    cards.forEach((card, index) => {
+      const item = visibleItems[index];
+      if (!item) {
+        card.style.display = 'none';
+        return;
       }
-      // If no image URL, keep it hidden
+
+      card.style.display = 'flex';
+      const image = card.querySelector('img');
+      if (image) {
+        image.style.display = 'none';
+        if (item.image && item.image.trim()) {
+          const tempImg = new Image();
+          tempImg.onload = function () {
+            image.src = item.image;
+            image.style.display = 'block';
+          };
+          tempImg.onerror = function () {
+            image.style.display = 'none';
+          };
+          tempImg.src = item.image;
+        }
+      }
+
+      const name = card.querySelector('h2');
+      const price = card.querySelector('.font-mono-data');
+      if (name) name.textContent = item.name;
+      if (price) price.textContent = item.priceTry || item.price;
+
+      const notes = card.querySelectorAll('ul p');
+      if (notes[0]) notes[0].innerHTML = `<strong class="font-medium text-on-surface">${escapeHtml(item.category || 'Kategori')}</strong> → canlı veri eşleşmesi`;
+      if (notes[1]) notes[1].textContent = item.ratingLabel || 'Puan bilgisi yok';
+      if (notes[2]) notes[2].textContent = item.description || 'Açıklama yok';
+    });
+  }
+
+  const itemById = new Map(allItems.map((item) => [String(item.id), item]));
+  const availablePrices = allItems.map(parseDisplayPrice).filter((value) => value > 0);
+  const fallbackMin = availablePrices.length ? Math.min(...availablePrices) : 0;
+  const fallbackMax = availablePrices.length ? Math.max(...availablePrices) : 0;
+  const configuredRange = aiFilters.priceRange || {};
+  const globalMin = Number.isFinite(configuredRange.min) ? configuredRange.min : fallbackMin;
+  const globalMax = Number.isFinite(configuredRange.max) ? configuredRange.max : fallbackMax;
+
+  const state = {
+    color: aiFilters?.color?.default || null,
+    category: aiFilters?.category?.default || null,
+    usage: aiFilters?.usage?.default || null,
+    minPrice: globalMin,
+    maxPrice: globalMax,
+  };
+
+  function getIdsFromPrefetch(bucketName, value) {
+    const bucket = prefetchedResults?.[bucketName] || {};
+    return Array.isArray(bucket[value]) ? bucket[value].map(String) : null;
+  }
+
+  function getIdsFromItems(key, value) {
+    return allItems
+      .filter((item) => item?.facets?.[key] === value)
+      .map((item) => String(item.id));
+  }
+
+  function intersect(base, subset) {
+    const subsetSet = new Set(subset);
+    return base.filter((id) => subsetSet.has(id));
+  }
+
+  function applyFilters() {
+    let ids = allItems.map((item) => String(item.id));
+
+    if (state.color) {
+      const colorIds = getIdsFromPrefetch('byColor', state.color) || getIdsFromItems('color', state.color);
+      ids = intersect(ids, colorIds);
+    }
+    if (state.category) {
+      const categoryIds = getIdsFromPrefetch('byCategory', state.category) || getIdsFromItems('category', state.category);
+      ids = intersect(ids, categoryIds);
+    }
+    if (state.usage) {
+      const usageIds = getIdsFromPrefetch('byUsage', state.usage) || getIdsFromItems('usage', state.usage);
+      ids = intersect(ids, usageIds);
     }
 
-    const name = card.querySelector('h2');
-    const price = card.querySelector('.font-mono-data');
-    if (name) name.textContent = item.name;
-    if (price) price.textContent = item.priceTry || item.price;
+    const filtered = ids
+      .map((id) => itemById.get(id))
+      .filter(Boolean)
+      .filter((item) => {
+        const price = parseDisplayPrice(item);
+        return price >= state.minPrice && price <= state.maxPrice;
+      });
 
-    const notes = card.querySelectorAll('ul p');
-    if (notes[0]) notes[0].innerHTML = `<strong class="font-medium text-on-surface">${escapeHtml(item.category || 'Kategori')}</strong> → canlı veri eşleşmesi`;
-    if (notes[1]) notes[1].textContent = item.ratingLabel || 'Puan bilgisi yok';
-    if (notes[2]) notes[2].textContent = item.description || 'Açıklama yok';
-  });
+    renderCards(filtered);
+    if (meta) {
+      meta.textContent = filtered.length
+        ? `Filtrelere uygun ${filtered.length} ürün bulundu. İlk ${Math.min(filtered.length, 3)} ürün gösteriliyor.`
+        : 'Bu filtre kombinasyonu için hazır içerik bulunamadı. Filtreleri genişletin.';
+    }
+  }
 
-  const filters = currentPayload?.analysis?.chips || [];
+  function setupPriceSlider() {
+    if (!inputMin || !inputMax || !fill) return;
+
+    inputMin.setAttribute('min', globalMin);
+    inputMin.setAttribute('max', globalMax);
+    inputMin.value = String(globalMin);
+
+    inputMax.setAttribute('min', globalMin);
+    inputMax.setAttribute('max', globalMax);
+    inputMax.value = String(globalMax);
+
+    if (minLabel) minLabel.textContent = formatTry(globalMin);
+    if (maxLabel) maxLabel.textContent = formatTry(globalMax);
+
+    const refresh = () => {
+      const lo = Math.min(Number(inputMin.value), Number(inputMax.value));
+      const hi = Math.max(Number(inputMin.value), Number(inputMax.value));
+      state.minPrice = lo;
+      state.maxPrice = hi;
+
+      const range = globalMax - globalMin || 1;
+      const leftPct = ((lo - globalMin) / range) * 100;
+      const rightPct = 100 - ((hi - globalMin) / range) * 100;
+      fill.style.left = `${leftPct}%`;
+      fill.style.right = `${rightPct}%`;
+      if (badge) badge.textContent = `${formatTry(lo)} – ${formatTry(hi)}`;
+
+      applyFilters();
+    };
+
+    inputMin.addEventListener('input', () => {
+      if (Number(inputMin.value) > Number(inputMax.value)) inputMin.value = inputMax.value;
+      refresh();
+    });
+    inputMax.addEventListener('input', () => {
+      if (Number(inputMax.value) < Number(inputMin.value)) inputMax.value = inputMin.value;
+      refresh();
+    });
+
+    refresh();
+  }
+
   const filterTitle = document.querySelector('aside h2');
   if (filterTitle) filterTitle.textContent = 'Sana özel filtreler';
-  const filterRows = document.querySelectorAll('aside .space-y-12 > div');
-  const width = filters[1]?.value || 'esnek';
-  const color = filters[2]?.value || 'nötr';
-  const usage = filters[3]?.value || 'genel kullanım';
 
-  if (filterRows[0]) filterRows[0].querySelector('p')?.textContent && (filterRows[0].querySelector('p').textContent = `Arama niyetini çözümledik ve en önemli alanları topladık.`);
-  const widthLabel = document.querySelector('aside label');
-  if (widthLabel) widthLabel.textContent = '1. GENİŞLİK';
-  const widthBadge = document.querySelector('aside .font-mono-data');
-  if (widthBadge) widthBadge.textContent = width;
-  const colorLabel = document.querySelectorAll('aside label')[1];
-  if (colorLabel) colorLabel.textContent = '2. RENK';
-  const colorButton = document.querySelector('aside .grid.grid-cols-3.gap-gutter.items-stretch button span:last-child');
-  if (colorButton) colorButton.textContent = color;
-  const usageText = document.querySelector('aside .flex.items-center.justify-between.p-4.bg-surface-container-low.rounded-lg.border.border-zinc-100 span:last-child');
-  if (usageText) usageText.textContent = usage;
+  const filterIntro = document.querySelector('aside p.text-xs, aside p.text-sm');
+  if (filterIntro) filterIntro.textContent = 'Arama niyetini analiz ettik ve hazır sonuç kümeleri oluşturduk.';
+
+  const filterNote = document.querySelector('aside .pt-4 p, aside .pt-6 p');
+  if (filterNote) filterNote.textContent = aiFilters.note || '* Bu filtreler AI tarafından sorgunuza özel üretilmiştir.';
+
+  const colorGrid = document.querySelector('aside .grid.grid-cols-2');
+  if (colorGrid && Array.isArray(aiFilters?.color?.options) && aiFilters.color.options.length) {
+    colorGrid.innerHTML = '';
+    aiFilters.color.options.forEach((option) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.filter = 'color';
+      button.dataset.value = option.id;
+      button.className = 'flex items-center justify-center gap-2 py-2 lg:py-3 rounded-lg border transition-all';
+      button.innerHTML = `<span class="font-label-caps text-[9px] lg:text-[10px]">${escapeHtml(option.label)} (${option.count})</span>`;
+      colorGrid.appendChild(button);
+      button.addEventListener('click', () => {
+        state.color = option.id;
+        colorGrid.querySelectorAll('button').forEach((node) => {
+          node.classList.remove('border-black', 'bg-white');
+          node.classList.add('border-zinc-200', 'bg-zinc-50');
+        });
+        button.classList.add('border-black', 'bg-white');
+        button.classList.remove('border-zinc-200', 'bg-zinc-50');
+        applyFilters();
+      });
+      if (option.id === state.color) button.click();
+    });
+  }
+
+  const categoryContainer = Array.from(document.querySelectorAll('aside .flex.flex-wrap')).find((container) =>
+    container.querySelector('span')
+  );
+  if (categoryContainer && Array.isArray(aiFilters?.category?.options) && aiFilters.category.options.length) {
+    categoryContainer.innerHTML = '';
+    aiFilters.category.options.forEach((option) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.filter = 'category';
+      button.dataset.value = option.id;
+      button.className = 'px-3 py-1 lg:px-4 lg:py-2 rounded-full font-label-caps text-[9px] lg:text-[10px] border transition-all';
+      button.textContent = `${option.label.toUpperCase()} (${option.count})`;
+      categoryContainer.appendChild(button);
+      button.addEventListener('click', () => {
+        state.category = option.id;
+        categoryContainer.querySelectorAll('button').forEach((node) => {
+          node.classList.remove('bg-black', 'text-white');
+          node.classList.add('bg-zinc-100', 'text-zinc-500');
+        });
+        button.classList.add('bg-black', 'text-white');
+        button.classList.remove('bg-zinc-100', 'text-zinc-500');
+        applyFilters();
+      });
+      if (option.id === state.category) button.click();
+    });
+  }
+
+  const usagePanel = document.querySelector('aside .flex.items-center.justify-between.p-3, aside .flex.items-center.justify-between.p-4.bg-surface-container-low.rounded-lg.border.border-zinc-100');
+  if (usagePanel) {
+    const usageLabel = usagePanel.querySelector('span.text-secondary, span[class*="text-[11px]"], span[class*="text-[13px]"]');
+    const options = Array.isArray(aiFilters?.usage?.options) && aiFilters.usage.options.length
+      ? aiFilters.usage.options
+      : [{ id: 'genel', label: 'Genel', count: allItems.length }];
+    let usageIndex = Math.max(0, options.findIndex((option) => option.id === state.usage));
+    const refreshUsage = () => {
+      const active = options[usageIndex];
+      state.usage = active.id;
+      if (usageLabel) usageLabel.textContent = `${active.label} (${active.count})`;
+      applyFilters();
+    };
+    usagePanel.style.cursor = 'pointer';
+    usagePanel.addEventListener('click', () => {
+      usageIndex = (usageIndex + 1) % options.length;
+      refreshUsage();
+    });
+    refreshUsage();
+  }
+
+  setupPriceSlider();
+
+  const resetButton = document.querySelector('aside .pt-4 button:nth-child(2), aside .pt-6 button:nth-child(2)');
+  if (resetButton) {
+    resetButton.addEventListener('click', () => {
+      state.color = aiFilters?.color?.default || state.color;
+      state.category = aiFilters?.category?.default || state.category;
+      state.usage = aiFilters?.usage?.default || state.usage;
+      if (inputMin) inputMin.value = String(globalMin);
+      if (inputMax) inputMax.value = String(globalMax);
+      setupPriceSlider();
+      renderStage3(currentPayload);
+    });
+  }
 
   const summary = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl p');
   if (summary) summary.textContent = currentPayload?.summary?.body || 'Canlı veriler hazır.';

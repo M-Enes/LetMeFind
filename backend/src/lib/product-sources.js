@@ -123,6 +123,78 @@ function normalizeDummyProduct(product) {
   };
 }
 
+function detectQueryIntent(query) {
+  const source = String(query || '').toLowerCase();
+  if (/sofa|table|chair|desk|cabinet|shelf|bed|wardrobe|furniture|mobilya|masa|koltuk|karyola/.test(source)) return 'furniture';
+  if (/laptop|computer|notebook|bilgisayar/.test(source)) return 'laptops';
+  if (/phone|mobile|telefon|iphone|samsung/.test(source)) return 'smartphones';
+  if (/deodorant|perfume|fragrance|parfum|koku|cologne|aftershave/.test(source)) return 'fragrances';
+  if (/beauty|makeup|cosmetic|guzellik|güzellik|makyaj|lipstick|mascara/.test(source)) return 'beauty';
+  if (/book|kitap|novel|roman|edebiyat|safahat/.test(source)) return 'books';
+  return null;
+}
+
+function splitQueryTokens(query) {
+  return String(query || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ\s-]/gi, ' ')
+    .split(/\s+/)
+    .filter((token) => token.length >= 2);
+}
+
+function scoreProductMatch(product, queryTokens) {
+  const text = `${product.name || ''} ${product.description || ''} ${product.category || ''}`.toLowerCase();
+  return queryTokens.reduce((score, token) => (text.includes(token) ? score + 1 : score), 0);
+}
+
+function filterByRelevance(products, query) {
+  const tokens = splitQueryTokens(query);
+  if (!tokens.length) return products;
+
+  const withScores = products
+    .map((product) => ({ product, score: scoreProductMatch(product, tokens) }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return withScores.map((entry) => entry.product);
+}
+
+async function fetchDummyJsonByCategory(category) {
+  try {
+    const payload = await fetchJson(`https://dummyjson.com/products/category/${category}?limit=10`);
+    return (payload.products || []).map(normalizeDummyProduct);
+  } catch {
+    return [];
+  }
+}
+
+function normalizeOpenLibraryBook(doc, index) {
+  const fallbackUsd = 8 + index * 2;
+  return {
+    id: `book_${doc.key || index}`,
+    name: doc.title || 'Book',
+    price: `$${fallbackUsd}`,
+    usdPrice: fallbackUsd,
+    rating: 4.0,
+    ratingLabel: 'Puan 4.0',
+    category: 'books',
+    description: `${(doc.author_name && doc.author_name[0]) || 'Unknown Author'}${doc.first_publish_year ? `, ${doc.first_publish_year}` : ''}`,
+    source: 'OpenLibrary',
+    image: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg` : '',
+    url: doc.key ? `https://openlibrary.org${doc.key}` : 'https://openlibrary.org',
+  };
+}
+
+async function fetchOpenLibraryBooks(query) {
+  try {
+    const payload = await fetchJson(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`);
+    const docs = payload.docs || [];
+    return docs.slice(0, 10).map(normalizeOpenLibraryBook);
+  } catch {
+    return [];
+  }
+}
+
 async function fetchAmazonProducts(query) {
   if (!PRODUCT_SOURCES.amazon.enabled) {
     throw new Error('Amazon API not configured');
@@ -203,24 +275,10 @@ async function fetchDummyJsonProducts(query) {
   try {
     console.log('Trying DummyJSON...');
 
-    // Detect category from query
-    const isFurnitureQuery = /sofa|table|chair|desk|cabinet|shelf|bed|wardrobe|furniture|mobilya|masa|koltuk|karyola/i.test(query);
-    const isLaptopQuery = /laptop|computer|notebook|bilgisayar/i.test(query);
-    const isPhoneQuery = /phone|mobile|telefon|iphone|samsung/i.test(query);
-    const isBeautyQuery = /beauty|makeup|cosmetic|güzellik|makyaj/i.test(query);
-
-    let endpoint;
-    if (isFurnitureQuery) {
-      endpoint = 'https://dummyjson.com/products/category/furniture?limit=10';
-    } else if (isLaptopQuery) {
-      endpoint = 'https://dummyjson.com/products/category/laptops?limit=10';
-    } else if (isPhoneQuery) {
-      endpoint = 'https://dummyjson.com/products/category/smartphones?limit=10';
-    } else if (isBeautyQuery) {
-      endpoint = 'https://dummyjson.com/products/category/beauty?limit=10';
-    } else {
-      endpoint = `https://dummyjson.com/products/search?q=${encodeURIComponent(query || 'product')}`;
-    }
+    const intent = detectQueryIntent(query);
+    const endpoint = intent
+      ? `https://dummyjson.com/products/category/${intent}?limit=10`
+      : `https://dummyjson.com/products/search?q=${encodeURIComponent(query || 'product')}`;
 
     const payload = await fetchJson(endpoint);
     const results = (payload.products || []).slice(0, 5).map(normalizeDummyProduct);
@@ -294,8 +352,24 @@ async function fetchProductMatches(query) {
 
   console.log(`Results after deduplication: ${uniqueResults.length}`);
 
+  const relevantResults = filterByRelevance(uniqueResults, query);
+  let finalCandidates = relevantResults.length >= 3 ? relevantResults : uniqueResults;
+
+  const intent = detectQueryIntent(query);
+  if (intent) {
+    const intentMatches = intent === 'books'
+      ? await fetchOpenLibraryBooks(query)
+      : await fetchDummyJsonByCategory(intent);
+    if (intentMatches.length > 0) {
+      finalCandidates = [...intentMatches, ...finalCandidates].filter((product, index, array) => {
+        return array.findIndex((candidate) => candidate.id === product.id) === index;
+      });
+      sources.push(intent === 'books' ? 'OpenLibrary' : `DummyJSON(${intent})`);
+    }
+  }
+
   // Ensure we have at least some results
-  const finalResults = uniqueResults.length > 0 ? uniqueResults : [
+  const finalResults = finalCandidates.length > 0 ? finalCandidates : [
     {
       id: 'fallback_1',
       name: 'Hiçbir veri kaynağından sonuç alınamadı',
