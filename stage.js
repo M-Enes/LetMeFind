@@ -3,8 +3,9 @@ const STAGE_PAYLOAD_KEY = 'letmefind.payload';
 const DEFAULT_QUERY = '60-80 cm arası çalışma masası, siyah, metal ayaklı';
 
 const pathname = window.location.pathname;
-const stageMatch = pathname.match(/code([1-4])\.html$/);
-const stageNumber = stageMatch ? Number(stageMatch[1]) : 1;
+  const stageNames = ['discovery', 'thinking', 'results', 'comparison'];
+  const stageMatch = pathname.match(/(discovery|thinking|results|comparison)\.html$/);
+  const stageNumber = stageMatch ? stageNames.indexOf(stageMatch[1]) + 1 : 1;
 const url = new URL(window.location.href);
 const queryFromUrl = url.searchParams.get('q') || '';
 const storedQuery = sessionStorage.getItem(STAGE_QUERY_KEY) || '';
@@ -41,6 +42,88 @@ function setHtml(selector, value) {
   if (element) element.innerHTML = value;
 }
 
+function openGeminiPanel(payload) {
+  const existingPanel = document.getElementById('gemini-panel');
+  if (existingPanel) existingPanel.remove();
+
+  const panel = document.createElement('section');
+  panel.id = 'gemini-panel';
+  panel.style.position = 'fixed';
+  panel.style.inset = '0';
+  panel.style.zIndex = '1000';
+  panel.style.background = 'rgba(255,255,255,0.72)';
+  panel.style.backdropFilter = 'blur(18px)';
+  panel.style.display = 'grid';
+  panel.style.placeItems = 'center';
+  panel.innerHTML = `
+    <div style="width:min(720px, calc(100vw - 32px)); background:#fff; border:1px solid #e5e7eb; border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,0.12); padding:20px; display:grid; gap:16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:16px;">
+        <div>
+          <div style="font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#7e7576; font-weight:600;">Gemini</div>
+          <h3 style="margin:6px 0 0; font-size:24px; font-weight:400; letter-spacing:-.03em; color:#1a1c1d;">Ürünleri konuşalım</h3>
+        </div>
+        <button type="button" data-close style="min-height:40px; padding:0 14px; border-radius:999px; border:1px solid #e5e7eb; background:#fff;">Kapat</button>
+      </div>
+      <div data-log style="max-height:320px; overflow:auto; display:grid; gap:10px; padding-right:4px;"></div>
+      <form data-form style="display:flex; gap:10px;">
+        <input data-input type="text" placeholder="Bu seçeneklerden hangisi daha iyi?" style="flex:1; min-width:0; min-height:44px; padding:0 14px; border-radius:999px; border:1px solid #e5e7eb;" />
+        <button type="submit" style="min-height:44px; padding:0 18px; border-radius:999px; background:#000; color:#fff; border:0;">Gönder</button>
+      </form>
+    </div>
+  `;
+
+  const log = panel.querySelector('[data-log]');
+  const input = panel.querySelector('[data-input]');
+  const form = panel.querySelector('[data-form]');
+  const closeButton = panel.querySelector('[data-close]');
+  const items = payload?.items || [];
+
+  function appendMessage(text, role) {
+    const bubble = document.createElement('div');
+    bubble.textContent = text;
+    bubble.style.padding = '14px 16px';
+    bubble.style.borderRadius = '18px';
+    bubble.style.lineHeight = '1.6';
+    bubble.style.background = role === 'user' ? '#000' : '#f3f3f4';
+    bubble.style.color = role === 'user' ? '#fff' : '#1a1c1d';
+    bubble.style.marginLeft = role === 'user' ? '32px' : '0';
+    bubble.style.marginRight = role === 'assistant' ? '32px' : '0';
+    log.appendChild(bubble);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  appendMessage('Ürünleri kıyaslayabilirim. Sorunu yaz, kısa ve net bir yanıt döndüreyim.', 'assistant');
+
+  closeButton.addEventListener('click', () => panel.remove());
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    appendMessage(text, 'user');
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: payload?.query || query,
+          message: text,
+          products: items,
+        }),
+      });
+
+      const body = await response.json();
+      appendMessage(body.reply || 'Yanıt üretilemedi.', 'assistant');
+    } catch (error) {
+      appendMessage('Gemini yanıtı alınamadı.', 'assistant');
+    }
+  });
+
+  document.body.appendChild(panel);
+  input.focus();
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll('&', '&amp;')
@@ -56,6 +139,7 @@ function applyCommonBranding() {
 }
 
 function renderStage1() {
+  // Discovery: Initial search interface
   const textarea = document.querySelector('textarea');
   if (textarea) textarea.value = query;
 
@@ -81,7 +165,7 @@ function renderStage1() {
       const currentQuery = textarea?.value.trim() || query;
       const payload = await fetchPayload(currentQuery);
       saveContext(payload);
-      window.location.href = `code2.html?q=${encodeURIComponent(currentQuery)}`;
+      window.location.href = `thinking.html?q=${encodeURIComponent(currentQuery)}`;
     });
   }
 
@@ -122,6 +206,7 @@ function renderStage1() {
 }
 
 function renderStage2(payload) {
+  // Thinking: Analysis and processing
   const currentPayload = payload || loadContext();
   const queryText = currentPayload?.query || query;
   const analysis = currentPayload?.analysis;
@@ -151,11 +236,12 @@ function renderStage2(payload) {
   if (status) status.textContent = 'SYSTEM STATUS: THINKING';
 
   setTimeout(() => {
-    window.location.href = `code3.html?q=${encodeURIComponent(queryText)}`;
+    window.location.href = `results.html?q=${encodeURIComponent(queryText)}`;
   }, 1600);
 }
 
 function renderStage3(payload) {
+  // Results: Show live product results with filters
   const currentPayload = payload || loadContext();
   const queryText = currentPayload?.query || query;
   const items = currentPayload?.items || [];
@@ -206,24 +292,17 @@ function renderStage3(payload) {
   const summary = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl p');
   if (summary) summary.textContent = currentPayload?.summary?.body || 'Canlı veriler hazır.';
 
-  const continueButton = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl button.bg-primary');
+  const continueButton = document.querySelector('aside button');
   if (continueButton) {
     continueButton.textContent = 'KARŞILAŞTIRMAYA GEÇ';
     continueButton.addEventListener('click', () => {
-      window.location.href = `code4.html?q=${encodeURIComponent(queryText)}`;
-    });
-  }
-
-  const detailButton = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl button.text-primary');
-  if (detailButton) {
-    detailButton.textContent = 'GEMINI SORUSU';
-    detailButton.addEventListener('click', () => {
-      window.location.href = `code4.html?q=${encodeURIComponent(queryText)}#chat`;
+      window.location.href = `comparison.html?q=${encodeURIComponent(queryText)}`;
     });
   }
 }
 
 function renderStage4(payload) {
+  // Comparison: Side-by-side analysis with Gemini overlay
   const currentPayload = payload || loadContext();
   const items = currentPayload?.comparison || [];
   const title = document.querySelector('main h1');
@@ -265,6 +344,20 @@ function renderStage4(payload) {
 
   const bottomNote = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl p.text-label-caps');
   if (bottomNote) bottomNote.textContent = `Sonuçlar ${currentPayload?.items?.length || 0} canlı ürün ve TCMB kuru ile hazırlandı.`;
+
+  const primaryAction = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl button.bg-primary');
+  if (primaryAction) {
+    primaryAction.textContent = 'YENİ ARAMA';
+    primaryAction.addEventListener('click', () => {
+      window.location.href = 'discovery.html';
+    });
+  }
+
+  const secondaryAction = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl button.text-primary');
+  if (secondaryAction) {
+    secondaryAction.textContent = 'GEMINI SORUSU';
+    secondaryAction.addEventListener('click', () => openGeminiPanel(currentPayload));
+  }
 }
 
 async function main() {

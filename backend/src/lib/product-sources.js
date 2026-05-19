@@ -39,19 +39,70 @@ function normalizeDummyProduct(product) {
 }
 
 async function fetchDummyJsonProducts(query) {
-  const endpoint = `https://dummyjson.com/products/search?q=${encodeURIComponent(query || 'desk')}`;
-  const payload = await fetchJson(endpoint);
-  return (payload.products || []).map(normalizeDummyProduct);
+  // Try furniture category first for home goods queries
+  const isFurnitureQuery = /sofa|table|chair|desk|cabinet|shelf|bed|wardrobe|furniture|mobilya|masa|koltuk|karyola/i.test(query);
+  let endpoint;
+  
+  if (isFurnitureQuery) {
+    // Get furniture category with search
+    const categoryPayload = await fetchJson('https://dummyjson.com/products/category/furniture?limit=10');
+    const categoryProducts = (categoryPayload.products || []).map(normalizeDummyProduct);
+    
+    // If query is more specific, prioritize matching items
+    const queryLower = query.toLowerCase();
+    const matched = categoryProducts.filter(p => 
+      p.name.toLowerCase().includes(queryLower) || 
+      p.description.toLowerCase().includes(queryLower)
+    );
+    
+    return matched.length > 0 ? matched : categoryProducts;
+  } else {
+    // Default search for other categories
+    endpoint = `https://dummyjson.com/products/search?q=${encodeURIComponent(query || 'product')}`;
+    const payload = await fetchJson(endpoint);
+    return (payload.products || []).map(normalizeDummyProduct);
+  }
 }
 
-async function fetchFeaturedProducts() {
-  const payload = await fetchJson('https://dummyjson.com/products?limit=3');
-  return (payload.products || []).map(normalizeDummyProduct);
+async function fetchFeaturedProducts(query) {
+  // Return featured products based on query category
+  const isFurnitureQuery = /sofa|table|chair|desk|cabinet|shelf|bed|wardrobe|furniture|mobilya|masa|koltuk|karyola/i.test(query);
+  const categoryMap = {
+    furniture: 'furniture',
+    laptops: 'laptops',
+    phones: 'smartphones',
+    beauty: 'beauty',
+    fragrances: 'fragrances',
+    groceries: 'groceries',
+    skin_care: 'skin-care',
+  };
+
+  // Try to detect category from query
+  let category = 'smartphones'; // Default fallback category
+  if (isFurnitureQuery) {
+    category = 'furniture';
+  } else if (/laptop|computer|notebook/i.test(query)) {
+    category = 'laptops';
+  } else if (/phone|mobile|iphone|samsung/i.test(query)) {
+    category = 'smartphones';
+  } else if (/deodorant|perfume|fragrances|cologne|aftershave/i.test(query)) {
+    category = 'fragrances';
+  } else if (/beauty|makeup|cosmetic|lipstick|mascara/i.test(query)) {
+    category = 'beauty';
+  }
+
+  try {
+    const payload = await fetchJson(`https://dummyjson.com/products/category/${category}?limit=3`);
+    return (payload.products || []).map(normalizeDummyProduct);
+  } catch {
+    // Fallback to search if category fails
+    return [];
+  }
 }
 
 async function fetchProductMatches(query) {
   const searchResults = await fetchDummyJsonProducts(query);
-  const featured = searchResults.length >= 3 ? [] : await fetchFeaturedProducts();
+  const featured = searchResults.length >= 3 ? [] : await fetchFeaturedProducts(query);
   const merged = [...searchResults, ...featured].filter((product, index, array) => {
     return array.findIndex((candidate) => candidate.id === product.id) === index;
   });

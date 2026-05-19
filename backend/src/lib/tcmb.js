@@ -1,6 +1,40 @@
 const TCMB_XML_URL = 'https://www.tcmb.gov.tr/kurlar/today.xml';
+const EXCHANGERATE_HOST_API = 'https://api.exchangerate.host/latest?base=USD&symbols=TRY,EUR';
 
 async function fetchExchangeRates() {
+  try {
+    // Try Exchangerate.host first (no auth required, real-time data)
+    const response = await fetch(EXCHANGERATE_HOST_API, {
+      headers: {
+        'User-Agent': 'LetMeFind/1.0',
+        Accept: 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.rates && data.rates.TRY) {
+        return {
+          usdTry: Number(data.rates.TRY) || 1,
+          eurTry: Number(data.rates.EUR) || 1,
+          source: 'exchangerate.host',
+        };
+      }
+    }
+
+    // Fallback to TCMB if exchangerate.host fails
+    return await fetchTCMBRates();
+  } catch (error) {
+    console.warn('Exchange rate fetch failed, using defaults:', error.message);
+    return {
+      usdTry: 1,
+      eurTry: 1,
+      source: 'fallback',
+    };
+  }
+}
+
+async function fetchTCMBRates() {
   try {
     const response = await fetch(TCMB_XML_URL, {
       headers: {
@@ -20,11 +54,14 @@ async function fetchExchangeRates() {
     return {
       usdTry: usdTry || 1,
       eurTry: eurTry || 1,
+      source: 'tcmb',
     };
   } catch (error) {
+    console.warn('TCMB fetch failed:', error.message);
     return {
       usdTry: 1,
       eurTry: 1,
+      source: 'fallback',
     };
   }
 }
