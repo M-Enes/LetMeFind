@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const http = require('http');
 const { readFile } = require('fs/promises');
 const path = require('path');
@@ -96,4 +99,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, () => {
   console.log(`LetMeFind backend running at http://localhost:${port}`);
+  console.log('Environment status:');
+  console.log('- RAPIDAPI_KEY:', process.env.RAPIDAPI_KEY ? 'SET' : 'NOT SET');
+  console.log('- GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'SET' : 'NOT SET');
 });
