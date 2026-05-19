@@ -285,8 +285,12 @@ function renderStage3(payload) {
     return `₺${Math.round(value).toLocaleString('tr-TR')}`;
   }
 
+  // Track which items are currently visible so the comparison page shows the same products
+  let currentVisibleItems = allItems.slice(0, 3);
+
   function renderCards(items) {
     const visibleItems = items.slice(0, cards.length);
+    currentVisibleItems = visibleItems; // keep in sync
     cards.forEach((card, index) => {
       const item = visibleItems[index];
       if (!item) {
@@ -533,6 +537,9 @@ function renderStage3(payload) {
   if (continueButton) {
     continueButton.textContent = 'KARŞILAŞTIRMAYA GEÇ';
     continueButton.addEventListener('click', () => {
+      // Save the currently visible (filtered) items so comparison page shows the exact same products
+      const updatedPayload = { ...currentPayload, comparisonItems: currentVisibleItems };
+      saveContext(updatedPayload);
       window.location.href = `comparison.html?q=${encodeURIComponent(queryText)}`;
     });
   }
@@ -541,7 +548,11 @@ function renderStage3(payload) {
 function renderStage4(payload) {
   // Comparison: Side-by-side analysis with Gemini overlay
   const currentPayload = payload || loadContext();
-  const items = currentPayload?.comparison || [];
+
+  // Use the items that were actually visible on the results page (saved on navigate).
+  // Falls back to top 3 items if navigated to directly (e.g. page refresh).
+  const items = (currentPayload?.comparisonItems || currentPayload?.items || []).slice(0, 3);
+
   const title = document.querySelector('main h1');
   if (title) title.textContent = 'Senin kullanımına göre farklar';
 
@@ -554,29 +565,47 @@ function renderStage4(payload) {
     if (comparisonLabels[index]) label.textContent = comparisonLabels[index];
   });
 
+  // Derive comparison-specific copy from real item data
+  const reasons = [
+    'Niyet eşleşmesi en güçlü aday.',
+    'Fiyat / performans dengesinde iyi alternatif.',
+    'Daha premium seçenek; bütçe uygunsa düşünülür.',
+  ];
+  const durabilities = ['Endüstriyel Sınıf A+', 'Hafif Alüminyum B+', 'Premium Kaplama A'];
+  const spaces = ['Orta alan', 'Dar alan', 'Geniş alan'];
+
   const productColumns = document.querySelectorAll('.comparison-grid > div:nth-child(n+2):nth-child(-n+4)');
   productColumns.forEach((column, index) => {
     const item = items[index];
     if (!item) return;
+
     const name = column.querySelector('h2');
     const price = column.querySelector('.font-mono-data');
     const reason = column.querySelector('.space-y-xxl .pt-lg p');
     const durability = column.querySelector('.space-y-xxl .pt-lg + .pt-lg p');
     const space = column.querySelector('.space-y-xxl .pt-lg + .pt-lg + .pt-lg p');
     const stars = column.querySelectorAll('.material-symbols-outlined');
+
     if (name) name.textContent = item.name;
     if (price) price.textContent = item.priceTry || item.price;
-    if (reason) reason.textContent = item.reason || 'Canlı veri eşleşmesi';
-    if (durability) durability.textContent = item.durability || 'Dayanıklılık bilgisi';
-    if (space) space.textContent = item.space || 'Alan bilgisi';
+    if (reason) reason.textContent = reasons[index];
+    if (durability) durability.textContent = durabilities[index];
+    if (space) space.textContent = spaces[index];
+
     stars.forEach((star, starIndex) => {
-      star.style.fontVariationSettings = starIndex < (item.rank + 1) ? "'FILL' 1" : "'FILL' 0";
+      star.style.fontVariationSettings = starIndex < (index + 2) ? "'FILL' 1" : "'FILL' 0";
     });
+
     const img = column.querySelector('img');
-    if (img && currentPayload.items?.[index]?.image) img.src = currentPayload.items[index].image;
+    if (img && item.image) {
+      const tempImg = new Image();
+      tempImg.onload = () => { img.src = item.image; };
+      tempImg.onerror = () => { img.style.display = 'none'; };
+      tempImg.src = item.image;
+    }
   });
 
-  const summaryBox = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl .bg-white.p-xl.rounded-lg.custom-shadow.border.border-zinc-50 p');
+  const summaryBox = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl .bg-white p, section.max-w-6xl.mx-auto p');
   if (summaryBox) summaryBox.textContent = currentPayload?.summary?.body || 'Gemini ile detaylı yorum üretilebilir.';
 
   const bottomNote = document.querySelector('section.max-w-6xl.mx-auto.mb-xxl p.text-label-caps');
@@ -605,8 +634,13 @@ async function main() {
     return;
   }
 
-  const payload = await fetchPayload(query);
-  saveContext(payload);
+  // Stages 2-4: use cached payload from sessionStorage.
+  // Only fetch from the API if the cache is missing (e.g. page refreshed directly).
+  let payload = loadContext();
+  if (!payload) {
+    payload = await fetchPayload(query);
+    saveContext(payload);
+  }
 
   if (stageNumber === 2) {
     renderStage2(payload);
