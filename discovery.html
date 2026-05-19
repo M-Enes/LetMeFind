@@ -111,7 +111,7 @@
     </style>
 </head>
 <body class="bg-background text-on-background antialiased selection:bg-surface-container-highest" data-stage="1">
-<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between px-12 h-20 transition-all duration-500 ease-out">
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between px-4 md:px-8 lg:px-12 h-16 md:h-20 transition-all duration-500 ease-out">
 <div class="text-xl font-bold tracking-tighter text-zinc-900 dark:text-zinc-50 font-display">AIBot</div>
 <div class="hidden md:flex gap-x-8 items-center">
 <a class="font-sans tracking-tight text-sm font-medium text-zinc-900 dark:text-zinc-50 border-b border-zinc-900 dark:border-zinc-50 pb-1 transition-opacity active:opacity-70" href="#">Discover</a>
@@ -126,15 +126,15 @@
 </button>
 </div>
 </nav>
-<main class="min-h-screen flex flex-col items-center justify-center px-gutter pt-20">
+<main class="min-h-screen flex flex-col items-center justify-center px-4 md:px-6 lg:px-gutter pt-16 md:pt-20">
 <div class="w-full max-w-3xl flex flex-col items-center space-y-md">
 <header class="text-center mb-sm">
-<h1 class="font-display text-display text-on-surface mb-xs tracking-tight">Selam, nasıl bir ürün arıyorsun?</h1>
+<h1 class="font-display text-on-surface mb-xs tracking-tight" style="font-size: clamp(28px, 6vw, 48px); line-height: 1.1; letter-spacing: -0.04em; font-weight: 300;">Selam, nasıl bir ürün arıyorsun?</h1>
 <p class="font-body-md text-secondary opacity-60">Albot ile ürünleri keşfedin ve analiz edin.</p>
 </header>
 <div class="w-full relative group">
 <div class="relative flex items-center bg-white border border-zinc-100 rounded-lg command-input-shadow transition-all duration-500 hover:border-zinc-200">
-<textarea class="w-full py-md px-xl bg-transparent border-none focus:ring-0 text-body-lg font-body-lg text-on-surface placeholder:text-zinc-300 resize-none min-h-[64px] flex items-center max-h-[140px] overflow-y-auto" placeholder="60-80 cm arası çalışma masası, siyah, metal ayaklı" style="scrollbar-width: thin; scrollbar-color: #e2e2e3 transparent;"></textarea>
+<textarea class="w-full py-md px-md md:px-xl bg-transparent border-none focus:ring-0 text-body-lg font-body-lg text-on-surface placeholder:text-zinc-300 resize-none min-h-[64px] flex items-center max-h-[140px] overflow-y-auto" placeholder="60-80 cm arası çalışma masası, siyah, metal ayaklı" style="scrollbar-width: thin; scrollbar-color: #e2e2e3 transparent;"></textarea>
 <div class="absolute right-md flex items-center space-x-sm">
 <button class="p-2.5 bg-primary text-on-primary rounded-full hover:bg-zinc-800 transition-all active:scale-95 flex items-center justify-center">
 <span class="material-symbols-outlined text-lg" data-icon="north_east">north_east</span>
@@ -155,7 +155,7 @@
 </div>
 </div>
 <!-- Condensed Primary Features Grid -->
-<section class="w-full max-w-7xl mt-xl grid grid-cols-1 md:grid-cols-3 gap-md px-gutter mb-xl">
+<section class="w-full max-w-7xl mt-xl grid grid-cols-1 md:grid-cols-3 gap-md px-4 md:px-gutter mb-xl">
 <div class="bg-white rounded-lg p-md border border-zinc-50 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.02)] flex flex-col justify-center">
 <div class="flex justify-between items-center mb-sm">
 <div>
@@ -188,7 +188,7 @@
 </div>
 </section>
 <!-- Condensed Secondary Features -->
-<section class="w-full max-w-5xl border-t border-zinc-100 py-lg">
+<section class="w-full max-w-5xl border-t border-zinc-100 py-lg px-4 md:px-0">
 <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
 <div class="flex flex-col gap-xs">
 <div class="w-8 h-0.5 bg-primary mb-xs"></div>
@@ -208,7 +208,7 @@
 </div>
 </section>
 </main>
-<footer class="w-full py-lg px-12 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center gap-md">
+<footer class="w-full py-lg px-4 md:px-8 lg:px-12 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center gap-md text-center md:text-left">
 <div class="flex gap-x-8">
 <span class="text-label-caps text-zinc-400">© 2024 Aether Search</span>
 <a class="text-label-caps text-zinc-400 hover:text-primary transition-colors" href="#">Privacy Policy</a>
