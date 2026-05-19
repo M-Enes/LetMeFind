@@ -3,9 +3,9 @@ const STAGE_PAYLOAD_KEY = 'letmefind.payload';
 const DEFAULT_QUERY = '60-80 cm arası çalışma masası, siyah, metal ayaklı';
 
 const pathname = window.location.pathname;
-  const stageNames = ['discovery', 'thinking', 'results', 'comparison'];
-  const stageMatch = pathname.match(/(discovery|thinking|results|comparison)\.html$/);
-  const stageNumber = stageMatch ? stageNames.indexOf(stageMatch[1]) + 1 : 1;
+const stageNames = ['discovery', 'thinking', 'results', 'comparison'];
+const stageMatch = pathname.match(/(discovery|thinking|results|comparison)\.html$/);
+const stageNumber = stageMatch ? stageNames.indexOf(stageMatch[1]) + 1 : 1;
 const url = new URL(window.location.href);
 const queryFromUrl = url.searchParams.get('q') || '';
 const storedQuery = sessionStorage.getItem(STAGE_QUERY_KEY) || '';
@@ -250,11 +250,11 @@ function renderStage3(payload) {
   if (title) title.textContent = `'${queryText}' için en iyi seçenekler.`;
 
   const meta = document.querySelector('main p.font-body-lg');
-  
+
   // Handle empty results
   if (items.length === 0 || (items.length === 1 && items[0].id === 'fallback_1')) {
     if (meta) meta.textContent = `"${queryText}" için sonuç bulunamadı. Farklı anahtar kelimeler deneyin.`;
-    
+
     // Hide product grid and show empty state
     const productGrid = document.querySelector('main .grid.grid-cols-3.gap-gutter.items-stretch');
     if (productGrid) {
@@ -285,11 +285,32 @@ function renderStage3(payload) {
       card.style.display = 'none';
       return;
     }
-    
+
     // Show and populate card
     card.style.display = 'block';
+
+    // Handle image with simple loading state
     const image = card.querySelector('img');
-    if (image && item.image) image.src = item.image;
+    if (image) {
+      // Hide image initially
+      image.style.display = 'none';
+
+      if (item.image && item.image.trim()) {
+        // Try to load the image
+        const tempImg = new Image();
+        tempImg.onload = function () {
+          image.src = item.image;
+          image.style.display = 'block';
+        };
+        tempImg.onerror = function () {
+          // Keep image hidden if it fails to load
+          image.style.display = 'none';
+        };
+        tempImg.src = item.image;
+      }
+      // If no image URL, keep it hidden
+    }
+
     const name = card.querySelector('h2');
     const price = card.querySelector('.font-mono-data');
     if (name) name.textContent = item.name;
